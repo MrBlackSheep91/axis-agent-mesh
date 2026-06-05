@@ -1,0 +1,63 @@
+[
+  {
+    "role": "agentic_master",
+    "env_overrides": {},
+    "expected_model_id": "openai/gpt-5.4-mini"
+  },
+  {
+    "role": "critic",
+    "env_overrides": {},
+    "expected_model_id": "openai/gpt-5.4-nano"
+  },
+  {
+    "role": "intent_analyzer",
+    "env_overrides": {},
+    "expected_model_id": "openai/gpt-5.4-nano"
+  },
+  {
+    "role": "confirm_problem",
+    "env_overrides": {},
+    "expected_model_id": "openai/gpt-5.4-mini"
+  },
+  {
+    "role": "greet",
+    "env_overrides": {},
+    "expected_model_id": "openai/gpt-5.4-nano"
+  },
+  {
+    "role": "image_analyzer",
+    "env_overrides": {
+      "INVIDIA_MODEL_OVERRIDE_IMAGE_ANALYZER": "openai/gpt-5.4-nano"
+    },
+    "expected_model_id": "openai/gpt-5.4-nano"
+  },
+  {
+    "role": "search_help_center",
+    "env_overrides": {
+      "INVIDIA_MODEL_OVERRIDE_SEARCH_HELP_CENTER": "deepseek/deepseek-v4-flash"
+    },
+    "expected_model_id": "deepseek/deepseek-v4-flash"
+  },
+  {
+    "role": "acknowledge_escalation",
+    "env_overrides": {
+      "AXIS_MODEL_OVERRIDE_ACKNOWLEDGE_ESCALATION": "moonshotai/kimi-k2.6"
+    },
+    "expected_model_id": "moonshotai/kimi-k2.6"
+  },
+  {
+    "role": "shift_report",
+    "env_overrides": {
+      "AXIS_MODEL_OVERRIDE_SHIFT_REPORT": "qwen/qwen3.6-flash"
+    },
+    "expected_model_id": "qwen/qwen3.6-flash"
+  },
+  {
+    "role": "agentic_master",
+    "env_overrides": {
+      "AXIS_MODEL_OVERRIDE_AGENTIC_MASTER": "deepseek/deepseek-v4-pro",
+      "INVIDIA_MODEL_OVERRIDE_AGENTIC_MASTER": "moonshotai/kimi-k2.6"
+    },
+    "expected_model_id": "deepseek/deepseek-v4-pro"
+  }
+]

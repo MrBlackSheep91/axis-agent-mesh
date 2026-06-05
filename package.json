@@ -10,6 +10,16 @@
     "node": ">=20"
   },
   "scripts": {
-    "audit:models": "echo \"audit script lands in Phase 3\" && exit 0"
+    "audit:models": "echo \"audit script lands in Phase 3\" && exit 0",
+    "sync-twin": "tsx bin/sync-twin.ts",
+    "sync-twin:check": "tsx bin/sync-twin.ts --check",
+    "test": "npm -ws run test",
+    "build": "npm -ws run build"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "@types/node": "^20.0.0"
   }
 }

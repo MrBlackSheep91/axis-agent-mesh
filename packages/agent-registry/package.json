@@ -1,0 +1,35 @@
+{
+  "name": "@axis/agent-registry",
+  "version": "0.1.0",
+  "description": "Canonical TypeScript twin of the axis-agent-registry Python package. CATALOG + DEFAULT_ASSIGNMENTS + getModelFor with env-override resolution. Auto-mirrored from Python via bin/sync-twin.ts.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "typescript/src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
