@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "axis-agent-registry"
+version = "0.1.0"
+description = "Canonical model registry for the axis ecosystem (CATALOG + DEFAULT_ASSIGNMENTS + env-override resolution)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Proprietary"}
+authors = [
+    {name = "Maicol Martinez"}
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.setuptools.package-dir]
+"" = "python"

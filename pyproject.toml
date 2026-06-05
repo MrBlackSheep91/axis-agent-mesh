@@ -1,0 +1,19 @@
+# axis-agent-mesh root pyproject.toml
+#
+# This is the WORKSPACE marker, NOT a setuptools-installable project at root.
+# Each package owns its own pyproject.toml under packages/<name>/pyproject.toml.
+# This file exists to share tool config (black, ruff, pytest) across packages
+# and to make the monorepo discoverable by Python tooling.
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["packages/agent-registry/python/tests"]
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers"
