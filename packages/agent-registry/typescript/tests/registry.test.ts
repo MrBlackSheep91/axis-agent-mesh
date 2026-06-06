@@ -117,9 +117,9 @@ describe("public surface invariants", () => {
     expect(getSpec("nope/not-a-model")).toBeUndefined();
   });
 
-  it("Test 13: allAssignments returns 11 roles with fromOverride flag", () => {
+  it("Test 13: allAssignments returns 12 roles with fromOverride flag", () => {
     const dump = allAssignments();
-    expect(Object.keys(dump).length).toBe(11);
+    expect(Object.keys(dump).length).toBe(12);
     // No env set in this test -> fromOverride is false everywhere
     for (const [role, entry] of Object.entries(dump)) {
       expect(entry.modelId).toBe(DEFAULT_ASSIGNMENTS[role]);
@@ -148,7 +148,7 @@ describe("public surface invariants", () => {
     expect(typeof CATALOG).toBe("object");
     expect(typeof DEFAULT_ASSIGNMENTS).toBe("object");
     expect(Object.keys(CATALOG).length).toBe(9);
-    expect(Object.keys(DEFAULT_ASSIGNMENTS).length).toBe(11);
+    expect(Object.keys(DEFAULT_ASSIGNMENTS).length).toBe(12);
   });
 });
 

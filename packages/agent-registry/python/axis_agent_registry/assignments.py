@@ -41,6 +41,10 @@ DEFAULT_ASSIGNMENTS: dict[str, str] = {
     "confirm_problem": "openai/gpt-5.4-mini",
     # Greet first-turn paraphrase.
     "greet": "openai/gpt-5.4-nano",
+    # General-purpose cheap default for AXIS consumers (axis-cc, hybrid-crm).
+    # Decoupled from Sophie's agentic_master (D1/D6 - cost: $1.50/M vs $4.50/M).
+    # NOT used by Sophie - her agentic_master stays openai/gpt-5.4-mini.
+    "general_default": "google/gemini-3.1-flash-lite",
     # Multimodal image analysis (must support vision).
     "image_analyzer": "google/gemini-3.1-flash-lite",
     # Help Center match summarization.

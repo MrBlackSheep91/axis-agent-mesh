@@ -9,6 +9,7 @@ export const DEFAULT_ASSIGNMENTS: Record<string, string> = {
   "confirm_problem": "openai/gpt-5.4-mini",
   "critic": "openai/gpt-5.4-nano",
   "cross_conv_summary": "openai/gpt-5.4-nano",
+  "general_default": "google/gemini-3.1-flash-lite",
   "greet": "openai/gpt-5.4-nano",
   "image_analyzer": "google/gemini-3.1-flash-lite",
   "intent_analyzer": "openai/gpt-5.4-nano",

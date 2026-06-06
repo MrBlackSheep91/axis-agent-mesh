@@ -1,6 +1,6 @@
 {
   "name": "@axis/agent-registry",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Canonical TypeScript twin of the axis-agent-registry Python package. CATALOG + DEFAULT_ASSIGNMENTS + getModelFor with env-override resolution. Auto-mirrored from Python via bin/sync-twin.ts.",
   "type": "module",
   "main": "dist/index.js",
