@@ -22,6 +22,7 @@
  */
 export { CATALOG, type ModelSpec } from "./catalog.js";
 export { DEFAULT_ASSIGNMENTS } from "./assignments.js";
+export { RETIRED_MODELS } from "./retired.js";
 export {
   getModelFor,
   getSpec,

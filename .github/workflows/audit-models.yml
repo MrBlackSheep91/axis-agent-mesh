@@ -1,0 +1,20 @@
+name: audit-models
+
+# REG-03 drift gate: fails if any retired model ID (RETIRED_MODELS) appears in
+# this repo's source. Source of truth: packages/agent-registry RETIRED_MODELS.
+on:
+  push:
+    branches: [BlackSheep, main]
+  pull_request:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install --no-audit --no-fund
+      - name: Audit for retired model IDs
+        run: npx tsx bin/audit-models.ts --root .

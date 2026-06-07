@@ -19,7 +19,7 @@ Origin: extracted 2026-06-04 from /Users/eluru/invidia-chat-api/lib/model_regist
 from __future__ import annotations
 
 from .assignments import DEFAULT_ASSIGNMENTS
-from .catalog import CATALOG, ModelSpec
+from .catalog import CATALOG, RETIRED_MODELS, ModelSpec
 from .registry import (
     OVERRIDE_PREFIXES,
     all_assignments,
@@ -31,6 +31,7 @@ from .registry import (
 __all__ = [
     "CATALOG",
     "DEFAULT_ASSIGNMENTS",
+    "RETIRED_MODELS",
     "ModelSpec",
     "OVERRIDE_PREFIXES",
     "all_assignments",
@@ -39,4 +40,4 @@ __all__ = [
     "set_hybrid_crm_override_lookup",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.1.2"
