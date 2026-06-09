@@ -28,6 +28,7 @@ const SKIP_DIRS = new Set([
   "node_modules", ".git", "dist", "build", ".next", ".turbo", "coverage",
   "vendor", ".planning", "__pycache__", ".venv", "venv", "migrations",
   "tests", "__tests__", "test", "e2e", ".cache",
+  ".claude", // git worktrees + agent scratch carry their own copies; scanning them double-counts
 ]);
 // Files that legitimately CONTAIN retired ids as data/definitions, not as usage.
 function isExempt(path: string): boolean {
