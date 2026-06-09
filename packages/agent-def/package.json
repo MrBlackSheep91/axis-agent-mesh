@@ -1,0 +1,43 @@
+{
+  "name": "@axis/agent-def",
+  "version": "0.1.0",
+  "description": "Canonical AgentDefinition schema for the axis ecosystem — TS interface + JSON Schema + pydantic mirror + `axis-mesh validate` CLI. One contract every agent (MAIK, Sophie, Moltbook, Jaime, Lady) conforms to.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./schema": "./agent-definition.schema.json"
+  },
+  "bin": {
+    "axis-mesh": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "typescript/src",
+    "agent-definition.schema.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ajv": "^8.17.1",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

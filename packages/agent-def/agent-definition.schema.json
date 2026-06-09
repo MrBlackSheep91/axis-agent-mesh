@@ -1,0 +1,268 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://axis-agent-mesh/agent-definition.schema.json",
+  "title": "AgentDefinition",
+  "description": "Canonical contract every agent in the axis ecosystem conforms to. Mirror of @axis/agent-def TypeScript AgentDefinition (v1).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "identity", "goal", "context_scope", "skills", "model_routing", "guardrails", "kpis", "runtime"],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "description": "AgentDefinition FORMAT version. Loaders reject unknown versions.",
+      "const": 1
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "fqid", "name", "tenant", "version"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "fqid": {
+          "type": "string",
+          "description": "customer/org/agent",
+          "pattern": "^[a-z0-9-]+/[a-z0-9-]+/[a-z0-9-]+$"
+        },
+        "name": { "type": "string", "minLength": 1 },
+        "brand": { "type": "string" },
+        "tenant": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["customer", "org"],
+          "properties": {
+            "customer": { "type": "string", "minLength": 1 },
+            "org": { "type": "string", "minLength": 1 }
+          }
+        },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "goal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objective", "success_criteria"],
+      "properties": {
+        "objective": { "type": "string", "minLength": 1 },
+        "success_criteria": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "kpis_ref": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "context_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["memory_namespace", "knowledge_sources"],
+      "properties": {
+        "memory_namespace": { "type": "string", "minLength": 1 },
+        "knowledge_sources": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/knowledgeSource" }
+        },
+        "read_only_tenants": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "skills": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/skill" }
+    },
+    "model_routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default", "fallback_chain"],
+      "properties": {
+        "default": { "type": "string", "minLength": 1 },
+        "per_skill": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "per_stage": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "fallback_chain": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "canary": { "$ref": "#/$defs/canary" }
+      }
+    },
+    "guardrails": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/guardrail" }
+    },
+    "kpis": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/kpi" }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deployment_target", "trigger", "governance", "observability"],
+      "properties": {
+        "deployment_target": {
+          "type": "string",
+          "enum": ["axis-runtime", "axis-cc", "lambda", "local"]
+        },
+        "trigger": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/trigger" },
+          "minItems": 1
+        },
+        "governance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["confirmation_gate"],
+          "properties": {
+            "output_budget": { "type": "string", "enum": ["default", "tight", "loose"] },
+            "confirmation_gate": { "type": "string", "enum": ["disabled", "enabled", "required"] },
+            "reflection_interval": { "type": "number" }
+          }
+        },
+        "observability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["langfuse_project", "tags"],
+          "properties": {
+            "langfuse_project": { "type": "string", "minLength": 1 },
+            "tags": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "knowledgeSource": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "scope"],
+          "properties": {
+            "type": { "const": "axis-memory" },
+            "scope": { "type": "string" },
+            "max_chunks": { "type": "number" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "paths"],
+          "properties": {
+            "type": { "const": "vault" },
+            "paths": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "table"],
+          "properties": {
+            "type": { "const": "neon-table" },
+            "table": { "type": "string" },
+            "where": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "cypher"],
+          "properties": {
+            "type": { "const": "neo4j" },
+            "cypher": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "enabled"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "enabled": { "type": "boolean" },
+        "config_override": { "type": "object" }
+      }
+    },
+    "canary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["off", "shadow", "ab_split", "on"] },
+        "pct": { "type": "number", "minimum": 0, "maximum": 100 },
+        "target": { "type": "string" }
+      }
+    },
+    "guardrail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "severity", "config"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "severity": { "type": "string", "enum": ["block", "warn", "log"] },
+        "config": { "type": "object" }
+      }
+    },
+    "kpi": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "source", "direction"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "enum": ["langfuse", "postgres", "computed"] },
+        "query": { "type": "string" },
+        "target": { "type": "number" },
+        "direction": { "type": "string", "enum": ["higher_better", "lower_better"] }
+      }
+    },
+    "trigger": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "route"],
+          "properties": {
+            "type": { "const": "webhook" },
+            "route": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "cron"],
+          "properties": {
+            "type": { "const": "schedule" },
+            "cron": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "channel"],
+          "properties": {
+            "type": { "const": "queue" },
+            "channel": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": {
+            "type": { "const": "manual" }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "identity": {
+    "id": "b2c3d4e5-0002-4b6c-9d7e-2f3a4b5c6d7e",
+    "fqid": "invidia/main/sophie",
+    "name": "Sophie",
+    "brand": "Sophie",
+    "tenant": { "customer": "invidia", "org": "main" },
+    "version": 3
+  },
+  "goal": {
+    "objective": "Resolver tickets de soporte de Invidia de forma autonoma, sin escalar los de baja complejidad y enrutando los criticos al equipo humano.",
+    "success_criteria": [
+      "Mayoria de tickets low-tier resueltos sin intervencion humana",
+      "Tickets criticos/financieros escalados con dossier de contexto",
+      "Tono y SLA consistentes con la marca Invidia"
+    ],
+    "kpis_ref": ["ticket_resolution_pct", "escalation_rate"]
+  },
+  "context_scope": {
+    "memory_namespace": "customer/invidia/org/main/agent/sophie",
+    "knowledge_sources": [
+      { "type": "axis-memory", "scope": "invidia/main", "max_chunks": 8 },
+      { "type": "neon-table", "table": "support_conversations", "where": "tenant = 'invidia'" },
+      { "type": "vault", "paths": ["1-Projects/invidia/support-playbook"] }
+    ]
+  },
+  "skills": [
+    { "name": "greet", "version": "1.0.0", "enabled": true },
+    { "name": "escalate", "version": "1.0.0", "enabled": true },
+    { "name": "image_analyzer", "version": "1.1.0", "enabled": true },
+    { "name": "shift_report", "version": "1.0.0", "enabled": true },
+    { "name": "kyc_status", "version": "1.0.0", "enabled": true },
+    { "name": "deposit_help", "version": "1.0.0", "enabled": true },
+    { "name": "withdrawal_help", "version": "1.0.0", "enabled": true },
+    { "name": "account_lookup", "version": "1.0.0", "enabled": true },
+    { "name": "faq_search", "version": "1.2.0", "enabled": true },
+    { "name": "sentiment_check", "version": "1.0.0", "enabled": true },
+    { "name": "translate", "version": "1.0.0", "enabled": false }
+  ],
+  "model_routing": {
+    "default": "agentic_master",
+    "per_skill": {
+      "image_analyzer": "vision_default",
+      "translate": "general_default"
+    },
+    "fallback_chain": ["general_default", "deepseek/deepseek-v4-pro"],
+    "canary": { "mode": "shadow", "pct": 10, "target": "agentic_master_next" }
+  },
+  "guardrails": [
+    { "id": "rate-limit", "severity": "warn", "config": { "per_minute": 60 } },
+    { "id": "max-tokens", "severity": "block", "config": { "max": 800 } },
+    { "id": "blocked-pattern", "severity": "block", "config": { "patterns": ["api[_ ]?key", "password", "seed phrase"], "reason": "No exfiltrar secretos ni credenciales" } },
+    { "id": "no-financial-advice", "severity": "warn", "config": { "scope": "trading-advice", "reason": "Sophie no da consejos de inversion; deriva a compliance" } }
+  ],
+  "kpis": [
+    {
+      "name": "ticket_resolution_pct",
+      "source": "postgres",
+      "query": "SELECT count(*) FILTER (WHERE resolved_by='sophie')::float / count(*) FROM support_conversations WHERE tenant='invidia'",
+      "target": 0.7,
+      "direction": "higher_better"
+    },
+    {
+      "name": "escalation_rate",
+      "source": "postgres",
+      "query": "SELECT count(*) FILTER (WHERE escalated)::float / count(*) FROM support_conversations WHERE tenant='invidia'",
+      "target": 0.2,
+      "direction": "lower_better"
+    },
+    {
+      "name": "csat",
+      "source": "langfuse",
+      "target": 0.85,
+      "direction": "higher_better"
+    }
+  ],
+  "runtime": {
+    "deployment_target": "axis-runtime",
+    "trigger": [{ "type": "webhook", "route": "/webhook/intercom" }],
+    "governance": {
+      "output_budget": "default",
+      "confirmation_gate": "enabled"
+    },
+    "observability": {
+      "langfuse_project": "invidia",
+      "tags": ["sophie", "invidia", "support"]
+    }
+  }
+}

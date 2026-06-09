@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "identity": {
+    "id": "d4e5f6a7-0005-4d8e-bf9a-4b5c6d7e8f9a",
+    "fqid": "maicol/personal/lady",
+    "name": "Lady-OS",
+    "brand": "Lady",
+    "tenant": { "customer": "maicol", "org": "personal" },
+    "version": 1
+  },
+  "goal": {
+    "objective": "Ser el segundo cerebro de Lady Ferreira: generar briefs de contenido, ideas y analisis de moda/estilo, manteniendo lo tecnico/financiero fuera de scope (lo deriva a Maicol).",
+    "success_criteria": [
+      "Briefs de contenido entregables a partir de un brief deal o una idea",
+      "Reels/posts analizados con hooks y captions accionables",
+      "Temas tecnicos, de pagos o de infraestructura rechazados y derivados a Maicol"
+    ],
+    "kpis_ref": ["content_brief_throughput"]
+  },
+  "context_scope": {
+    "memory_namespace": "customer/maicol/org/personal/agent/lady",
+    "knowledge_sources": [
+      { "type": "axis-memory", "scope": "lady-os", "max_chunks": 3 },
+      { "type": "vault", "paths": ["1-Projects/lady-os", "3-Resources/content"] }
+    ]
+  },
+  "skills": [
+    { "name": "content-research", "version": "1.0.0", "enabled": true },
+    { "name": "brief-write", "version": "1.0.0", "enabled": true },
+    { "name": "reel-analyze", "version": "1.0.0", "enabled": true },
+    { "name": "trend-scan", "version": "1.0.0", "enabled": true }
+  ],
+  "model_routing": {
+    "default": "general_default",
+    "fallback_chain": ["google/gemini-2.0-flash-001", "agentic_master"]
+  },
+  "guardrails": [
+    { "id": "rate-limit", "severity": "block", "config": { "per_minute": 15 } },
+    { "id": "max-tokens", "severity": "block", "config": { "max": 300 } },
+    { "id": "blocked-pattern", "severity": "block", "config": { "patterns": ["api[_ ]?key", "token", "credencial", "server", "railway", "neon", "database", "github", "axis", "daemon", "prisma", "webhook"], "refuse_response": "Eso es mas tecnico, se lo paso a Maicol. Cualquier cosa de contenido o moda, preguntame!" } },
+    { "id": "allowed-scope", "severity": "warn", "config": { "scope": "Content creation, fashion, style, brand deals, analytics, social media" } }
+  ],
+  "kpis": [
+    {
+      "name": "content_brief_throughput",
+      "source": "computed",
+      "query": "count(briefs delivered per week)",
+      "target": 5,
+      "direction": "higher_better"
+    },
+    {
+      "name": "refuse_precision",
+      "source": "langfuse",
+      "target": 0.95,
+      "direction": "higher_better"
+    }
+  ],
+  "runtime": {
+    "deployment_target": "axis-runtime",
+    "trigger": [{ "type": "manual" }],
+    "governance": {
+      "output_budget": "tight",
+      "confirmation_gate": "enabled"
+    },
+    "observability": {
+      "langfuse_project": "axis-cc",
+      "tags": ["lady", "lady-os", "content", "fashion"]
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "identity": {
+    "id": "a1b2c3d4-0001-4a5b-8c6d-1e2f3a4b5c6d",
+    "fqid": "maicol/personal/maik",
+    "name": "MAIK",
+    "brand": "MAIK",
+    "tenant": { "customer": "maicol", "org": "personal" },
+    "version": 1
+  },
+  "goal": {
+    "objective": "Devolver tiempo a Maicol actuando como su asistente personal por WhatsApp: capturar, recordar y ejecutar sin que Maicol tenga que entrar a una pantalla.",
+    "success_criteria": [
+      "Maicol puede capturar una tarea/idea por WhatsApp y aparece en AXIS CC sin pasos manuales",
+      "Las respuestas llegan completas (sin truncado) y en menos de 30s",
+      "Cero acciones destructivas ejecutadas sin confirmacion explicita de Maicol"
+    ],
+    "kpis_ref": ["response_latency_p95", "capture_success_rate"]
+  },
+  "context_scope": {
+    "memory_namespace": "customer/maicol/org/personal/agent/maik",
+    "knowledge_sources": [
+      { "type": "axis-memory", "scope": "maicol/personal", "max_chunks": 6 },
+      { "type": "vault", "paths": ["0-Inbox", "System/sessions", "People"] },
+      { "type": "neon-table", "table": "cc_tasks", "where": "status != 'done'" }
+    ]
+  },
+  "skills": [
+    { "name": "self-tools", "version": "1.0.0", "enabled": true },
+    { "name": "axis-cc", "version": "1.0.0", "enabled": true },
+    { "name": "axis-memory", "version": "1.0.0", "enabled": true }
+  ],
+  "model_routing": {
+    "default": "agentic_master",
+    "fallback_chain": ["deepseek/deepseek-v4-pro", "general_default"]
+  },
+  "guardrails": [
+    { "id": "rate-limit", "severity": "warn", "config": { "per_minute": 30 } },
+    { "id": "max-tokens", "severity": "block", "config": { "max": 1200 } },
+    { "id": "confirmation-required", "severity": "block", "config": { "scope": "destructive", "reason": "Acciones que escriben/borran data requieren confirmacion de Maicol" } }
+  ],
+  "kpis": [
+    {
+      "name": "response_latency_p95",
+      "source": "langfuse",
+      "query": "p95(latency_ms) where agent='maik'",
+      "target": 30000,
+      "direction": "lower_better"
+    },
+    {
+      "name": "capture_success_rate",
+      "source": "postgres",
+      "query": "SELECT count(*) FILTER (WHERE source='whatsapp')::float / count(*) FROM cc_collab_inbox",
+      "target": 0.95,
+      "direction": "higher_better"
+    }
+  ],
+  "runtime": {
+    "deployment_target": "axis-runtime",
+    "trigger": [{ "type": "webhook", "route": "/webhook/evolution" }],
+    "governance": {
+      "output_budget": "tight",
+      "confirmation_gate": "required",
+      "reflection_interval": 10
+    },
+    "observability": {
+      "langfuse_project": "axis-cc",
+      "tags": ["maik", "maicol", "personal", "whatsapp"]
+    }
+  }
+}

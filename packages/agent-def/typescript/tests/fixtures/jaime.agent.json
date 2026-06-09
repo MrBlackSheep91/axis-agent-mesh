@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "identity": {
+    "id": "74f03ced-4be1-4f97-b6e5-ed4b1777c956",
+    "fqid": "jaime/main/jaime",
+    "name": "Jaime",
+    "brand": "FlyAgency",
+    "tenant": { "customer": "jaime", "org": "main" },
+    "version": 1
+  },
+  "goal": {
+    "objective": "Atender consultas de viajes de FlyAgency por WhatsApp (vuelos, hoteles, paquetes, cotizaciones) y escalar a un humano todo lo que toque pagos, quejas o contratos.",
+    "success_criteria": [
+      "Consultas de viaje respondidas automaticamente dentro de scope",
+      "Pagos, reembolsos, quejas y contratos escalados a humano",
+      "Consultas fuera de scope rechazadas con el mensaje de marca"
+    ],
+    "kpis_ref": ["auto_response_rate"]
+  },
+  "context_scope": {
+    "memory_namespace": "customer/jaime/org/main/agent/jaime",
+    "knowledge_sources": [
+      { "type": "axis-memory", "scope": "jaime/main", "max_chunks": 4 },
+      { "type": "neon-table", "table": "hybrid_crm_agents", "where": "id = '74f03ced-4be1-4f97-b6e5-ed4b1777c956'" }
+    ]
+  },
+  "skills": [
+    { "name": "travel-classify", "version": "1.0.0", "enabled": true },
+    { "name": "escalate", "version": "1.0.0", "enabled": true },
+    { "name": "crm-context", "version": "1.0.0", "enabled": true }
+  ],
+  "model_routing": {
+    "default": "general_default",
+    "fallback_chain": ["google/gemini-2.0-flash-001", "agentic_master"]
+  },
+  "guardrails": [
+    { "id": "rate-limit", "severity": "block", "config": { "per_minute": 15 } },
+    { "id": "max-tokens", "severity": "block", "config": { "max": 300 } },
+    { "id": "allowed-scope", "severity": "warn", "config": { "scope": "Travel, tourism, FlyAgency services", "refuse_response": "Soy Jaime de FlyAgency, me especializo en viajes. Para otro tipo de consultas, te recomiendo contactar directamente a nuestro equipo." } }
+  ],
+  "kpis": [
+    {
+      "name": "auto_response_rate",
+      "source": "postgres",
+      "query": "SELECT count(*) FILTER (WHERE classification='auto')::float / count(*) FROM messages WHERE agent_id='jaime'",
+      "target": 0.8,
+      "direction": "higher_better"
+    },
+    {
+      "name": "escalation_accuracy",
+      "source": "computed",
+      "target": 0.9,
+      "direction": "higher_better"
+    }
+  ],
+  "runtime": {
+    "deployment_target": "axis-runtime",
+    "trigger": [{ "type": "webhook", "route": "/webhook/evolution" }],
+    "governance": {
+      "output_budget": "tight",
+      "confirmation_gate": "enabled"
+    },
+    "observability": {
+      "langfuse_project": "axis-cc",
+      "tags": ["jaime", "flyagency", "travel", "whatsapp"]
+    }
+  }
+}
