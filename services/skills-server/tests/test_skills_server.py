@@ -6,7 +6,7 @@ rejection, cross-tenant isolation) is verified in the README's run recipe.
 """
 import pytest
 
-from axis_skills_server import auth, tools
+from axis_skills_server import auth, catalog, tools
 
 
 @pytest.mark.asyncio
@@ -83,3 +83,59 @@ async def test_search_uses_namespace_from_token(monkeypatch):
     monkeypatch.setattr(tools.httpx, "AsyncClient", _Client)
     await tools.axis_memory_search("q")
     assert captured["namespace"] == "customer/invidia/org/main/agent/sophie"
+
+
+# ── Phase 5c: declarative catalog + tools ported from axis-runtime (cross-repo) ──
+
+
+def test_catalog_registers_all_shared_tools():
+    """register_catalog wires every ToolSpec; names include the 2 ported from axis-runtime."""
+    registered = []
+
+    class _FakeMCP:
+        def tool(self, fn, name=None, description=None, tags=None):
+            registered.append(name)
+
+    names = catalog.register_catalog(_FakeMCP())
+    assert set(names) == {"axis_memory_search", "axis_memory_remember", "capture", "create_task"}
+    assert registered == names  # every catalog entry actually registered
+
+
+def test_catalog_marks_ported_tools_provenance():
+    """The cross-repo story is explicit: create_task + remember come FROM axis-runtime."""
+    by_name = {s.name: s for s in catalog.CATALOG}
+    assert by_name["create_task"].origin.startswith("axis-runtime/")
+    assert by_name["axis_memory_remember"].origin.startswith("axis-runtime/")
+    # write tools must be flagged so they honour SKILLS_DRY_RUN
+    assert by_name["create_task"].writes is True
+    assert by_name["axis_memory_remember"].writes is True
+    assert by_name["axis_memory_search"].writes is False
+
+
+@pytest.mark.asyncio
+async def test_create_task_cross_repo_tenant_isolation_dry_run(monkeypatch):
+    """ROADMAP criterion 5: a Sophie(invidia) caller runs an axis-runtime-ported tool,
+    and the SAME tool with MAIK's token resolves to MAIK's tenant — isolation from token."""
+    monkeypatch.setenv("SKILLS_DRY_RUN", "1")
+    # Sophie's token → invidia
+    monkeypatch.setattr(tools, "current_principal", lambda: auth.Principal("sophie", "invidia", "ns"))
+    r = await tools.create_task("Investigate ticket", project="invidia", priority="high")
+    assert r["dry_run"] is True
+    assert r["by"] == "sophie" and r["tenant"] == "invidia"
+    assert r["body"] == {"title": "Investigate ticket", "priority": "high", "project": "invidia"}
+    # Same tool, MAIK's token → maicol (cross-tenant isolation holds, tenant from token)
+    monkeypatch.setattr(tools, "current_principal", lambda: auth.Principal("maik", "maicol", "ns"))
+    r2 = await tools.create_task("Plan the week")
+    assert r2["by"] == "maik" and r2["tenant"] == "maicol"
+
+
+@pytest.mark.asyncio
+async def test_remember_namespace_from_token_dry_run(monkeypatch):
+    """axis_memory_remember writes into the caller's namespace (from token), not an arg."""
+    monkeypatch.setenv("SKILLS_DRY_RUN", "1")
+    monkeypatch.setattr(tools, "current_principal", lambda: auth.Principal("sophie", "invidia", "customer/invidia/x"))
+    r = await tools.axis_memory_remember("a fact learned", type="fact")
+    assert r["dry_run"] is True
+    assert r["body"]["namespace"] == "customer/invidia/x"  # from token, not an argument
+    assert r["body"]["content"] == "a fact learned"
+    assert r["body"]["type"] == "fact"

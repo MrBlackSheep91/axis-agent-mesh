@@ -9,12 +9,26 @@ capability **once** instead of N times per repo.
 > Sophie/MAIK are **not** pointed at it yet — that cutover is Wave C, behind a shadow
 > canary. Deploying to Contabo is a separate, explicitly-approved step (see below).
 
-## Tools (the two most-duplicated capabilities)
+## Tools (the shared `type: tool` catalog)
 
-| Tool | Replaces | Writes? |
-|------|----------|---------|
-| `axis_memory_search(query, mode?, limit?)` | 3 copies (Py skill, Py REGISTRY, TS unified-memory) | no (read-only) |
-| `capture(text, type?, project?)` | 2 copies (Py `create_capture`, TS `createCapture`) | yes (→ AXIS CC `/api/capture`) |
+All shared tools live in one declarative catalog (`catalog.py`) — adding one is a
+single `ToolSpec` entry, not boilerplate. Each entry records its `origin` (the repo
+the capability is canonicalized from), so the catalog doubles as the cross-repo map.
+
+| Tool | Origin | Writes? |
+|------|--------|---------|
+| `axis_memory_search(query, mode?, limit?)` | mesh/axis-memory — replaces 3 copies (Py skill, Py REGISTRY, TS unified-memory) | no (read-only) |
+| `axis_memory_remember(text, type?, tags?)` | **axis-runtime** REGISTRY `_tool_memory_remember` (ported, 5c) | yes (→ AXIS Memory `/ingest/text`) |
+| `capture(text, type?, project?)` | mesh/axis-cc — replaces 2 copies (Py `create_capture`, TS `createCapture`) | yes (→ AXIS CC `/api/capture`) |
+| `create_task(title, project?, priority?, due?)` | **axis-runtime** REGISTRY `_tool_create_task` (ported, 5c) | yes (→ AXIS CC `/api/tasks`) |
+
+**Cross-repo (ROADMAP criterion 5):** `create_task` / `axis_memory_remember` are
+*ported from axis-runtime's REGISTRY*. A client carrying Sophie's (invidia) token
+executing them over HTTP IS a cross-repo skill call — proven end-to-end with tenant
+isolation (same tool, MAIK's token → MAIK's tenant), **without touching Sophie in
+prod** (Sophie's own cutover stays in Wave C). Write tools honour `SKILLS_DRY_RUN`,
+so the proof never creates junk. FastMCP derives each tool's schema from the Python
+signature in `tools.py`, so schemas are defined once — no hand-copied drift.
 
 ## Security model (tenant isolation)
 
@@ -45,7 +59,7 @@ from fastmcp import Client
 import asyncio
 async def main():
     async with Client("http://127.0.0.1:8300/mcp", auth="dev-sophie") as c:
-        print([t.name for t in await c.list_tools()])             # ['axis_memory_search', 'capture']
+        print([t.name for t in await c.list_tools()])             # 4: search, remember, capture, create_task
         print((await c.call_tool("capture", {"text": "hi"})).data) # by: 'sophie' (from token)
 asyncio.run(main())
 ```
