@@ -188,9 +188,10 @@
       "required": ["name", "version", "enabled"],
       "properties": {
         "name": { "type": "string", "minLength": 1 },
-        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "version": { "type": "string", "pattern": "^(\\d+\\.\\d+\\.\\d+|\\*)$" },
         "enabled": { "type": "boolean" },
-        "config_override": { "type": "object" }
+        "config_override": { "type": "object" },
+        "source": { "type": "string", "enum": ["mcp", "inprocess", "declarative"] }
       }
     },
     "canary": {

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://axis-agent-mesh/skill-manifest.schema.json",
+  "title": "SkillManifest",
+  "description": "Extended SKILL.md frontmatter. Mirror of @axis/skill-registry SkillManifest (v1). additionalProperties:true to tolerate legacy frontmatter keys (e.g. allowed-tools).",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["name", "description"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1, "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "description": { "type": "string", "minLength": 1 },
+    "tools_exposed": { "type": "array", "items": { "type": "string" } },
+    "platforms": { "type": "array", "items": { "type": "string" } },
+    "user_invocable": { "type": "boolean" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "type": { "type": "string", "enum": ["tool", "inprocess", "declarative"] },
+    "io_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "input": { "type": "object" },
+        "output": { "type": "object" }
+      }
+    },
+    "transport": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "server", "tool"],
+          "properties": {
+            "kind": { "const": "mcp" },
+            "server": { "type": "string", "minLength": 1 },
+            "tool": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "module"],
+          "properties": {
+            "kind": { "const": "inproc" },
+            "module": { "type": "string", "minLength": 1 },
+            "export": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "tool"],
+          "properties": {
+            "kind": { "const": "registry" },
+            "tool": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "dependencies": { "type": "array", "items": { "type": "string" } },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "tenants": { "type": "array", "items": { "type": "string" } }
+  }
+}

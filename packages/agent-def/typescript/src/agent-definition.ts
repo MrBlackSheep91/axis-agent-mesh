@@ -86,12 +86,19 @@ export type KnowledgeSource =
 // ─── skills ────────────────────────────────────────────────────────────────────
 
 export interface AgentSkill {
-  /** Matches a skill-registry id. */
+  /** Matches a skill-registry id (resolved via @axis/skill-registry). */
   name: string;
-  /** Semver, e.g. "1.2.0". */
+  /** Semver, e.g. "1.2.0", or "*" for latest. */
   version: string;
   enabled: boolean;
   config_override?: Record<string, unknown>;
+  /**
+   * Optional resolution hint. Normally the skill's own manifest declares its kind
+   * (tool→MCP / inprocess / declarative); this overrides it for this agent. When
+   * absent, the loader resolves the kind from the skill manifest (single source of
+   * truth). Added in Phase 5a — backward-compatible (optional).
+   */
+  source?: "mcp" | "inprocess" | "declarative";
 }
 
 // ─── model routing ─────────────────────────────────────────────────────────────
