@@ -146,7 +146,7 @@ export interface AgentKpi {
 // ─── runtime ────────────────────────────────────────────────────────────────────
 
 export interface AgentRuntime {
-  deployment_target: "axis-runtime" | "axis-cc" | "lambda" | "local";
+  deployment_target: "axis-runtime" | "axis-cc" | "standalone" | "lambda" | "local";
   trigger: AgentTrigger[];
   governance: AgentGovernance;
   observability: AgentObservability;

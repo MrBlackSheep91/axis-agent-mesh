@@ -110,7 +110,7 @@
       "properties": {
         "deployment_target": {
           "type": "string",
-          "enum": ["axis-runtime", "axis-cc", "lambda", "local"]
+          "enum": ["axis-runtime", "axis-cc", "standalone", "lambda", "local"]
         },
         "trigger": {
           "type": "array",

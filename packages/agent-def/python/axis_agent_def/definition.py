@@ -254,7 +254,7 @@ class AgentRuntime(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    deployment_target: Literal["axis-runtime", "axis-cc", "lambda", "local"]
+    deployment_target: Literal["axis-runtime", "axis-cc", "standalone", "lambda", "local"]
     trigger: List[AgentTrigger]
     governance: AgentGovernance
     observability: AgentObservability
