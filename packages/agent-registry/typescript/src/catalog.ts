@@ -56,6 +56,17 @@ export const CATALOG: Record<string, ModelSpec> = {
     notes: "Mid-tier DeepSeek. Reasoning toggle.",
     leakRisk: "low",
   },
+  "google/gemini-3.1-flash": {
+    id: "google/gemini-3.1-flash",
+    inPricePerM: 0.3,
+    outPricePerM: 2.5,
+    ctxTokens: 1048576,
+    supportsTools: true,
+    released: "2026-05-07",
+    family: "google",
+    notes: "Full Gemini 3.1 Flash (non-lite). Current prod agentic_master via INVIDIA_MODEL_OVERRIDE_AGENTIC_MASTER. Multimodal, clean tool calling, strong multilingual (ES/DE/IT).",
+    leakRisk: "low",
+  },
   "google/gemini-3.1-flash-lite": {
     id: "google/gemini-3.1-flash-lite",
     inPricePerM: 0.25,

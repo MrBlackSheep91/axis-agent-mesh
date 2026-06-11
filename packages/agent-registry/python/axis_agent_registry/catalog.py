@@ -90,6 +90,13 @@ CATALOG: dict[str, ModelSpec] = {
         released="2026-05-07",
         notes="Multimodal (vision). Clean tools in test. Good for image_analyzer.",
     ),
+    "google/gemini-3.1-flash": ModelSpec(
+        id="google/gemini-3.1-flash",
+        in_price_per_m=0.30, out_price_per_m=2.50,
+        ctx_tokens=1_048_576, supports_tools=True, family="google",
+        released="2026-05-07",
+        notes="Full Gemini 3.1 Flash (non-lite). Current prod agentic_master via INVIDIA_MODEL_OVERRIDE_AGENTIC_MASTER. Multimodal, clean tool calling, strong multilingual (ES/DE/IT).",
+    ),
     "qwen/qwen3.6-flash": ModelSpec(
         id="qwen/qwen3.6-flash",
         in_price_per_m=0.25, out_price_per_m=1.50,

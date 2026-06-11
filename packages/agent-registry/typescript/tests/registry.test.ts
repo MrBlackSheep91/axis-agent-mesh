@@ -147,7 +147,7 @@ describe("public surface invariants", () => {
     expect(Array.isArray(OVERRIDE_PREFIXES)).toBe(true);
     expect(typeof CATALOG).toBe("object");
     expect(typeof DEFAULT_ASSIGNMENTS).toBe("object");
-    expect(Object.keys(CATALOG).length).toBe(9);
+    expect(Object.keys(CATALOG).length).toBe(10);
     expect(Object.keys(DEFAULT_ASSIGNMENTS).length).toBe(12);
   });
 });
